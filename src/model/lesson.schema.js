@@ -9,4 +9,4 @@ const lessonSchema = new Schema({
 }, {
     timestamps: true
 });
-export const Lesson = models.Module || model("Module", lessonSchema)
+export const Lesson = models.Module || model("Lesson", lessonSchema)
