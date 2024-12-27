@@ -6,7 +6,7 @@ import { createCourse } from "../controller/course.controller.js";
 import { admin } from "../middleware/admin.middleware.js";
 const router = express.Router()
 
-router.route("/courses").post(auth,admin, createCourse)
+router.route("/courses").post(auth, admin, upload.single("thumbnail"), createCourse)
 
 
 export default router
