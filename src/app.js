@@ -12,7 +12,9 @@ app.use(cookieParser());
 app.use(express.static("public"));
 
 import userRoute from "./route/user.route.js";
+import courseRoute from "./route/course.route.js";
 app.use("/api/v1", userRoute);
+app.use("/api/v1", courseRoute);
 
 
 app.get("/test", (_, res) => {
