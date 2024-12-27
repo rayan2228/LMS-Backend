@@ -2,10 +2,16 @@ import mongoose, { Schema } from "mongoose";
 
 const courseSchema = new Schema({
     title: { type: String, required: true },
-    slug: { type: String, lowercase: true },
+    slug: {
+        type: String,
+        unique: true,
+        trim: true,
+        lowercase: true
+    },
     description: { type: String, required: true },
     instructor: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     category: [{ type: Schema.Types.ObjectId, ref: 'Category', required: true }],
+    subcategory: [{ type: Schema.Types.ObjectId, ref: 'Subcategory', required: true }],
     price: { type: Number, default: 0 },
     discountedPrice: {
         discountType: {
