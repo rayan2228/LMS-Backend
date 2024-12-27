@@ -13,16 +13,8 @@ const courseSchema = new Schema({
     category: [{ type: Schema.Types.ObjectId, ref: 'Category', required: true }],
     subcategory: [{ type: Schema.Types.ObjectId, ref: 'Subcategory', required: true }],
     price: { type: Number, default: 0 },
-    discountedPrice: {
-        discountType: {
-            type: String,
-            enum: ["fixed", "parcentage"],
-        },
-        value: {
-            type: Number,
-            default: 0
-        }
-    },
+    discountType: { type: String, enum: ["percentage", "fixed"] },
+    discountValue: { type: Number },
     thumbnail: {
         public_id: String,
         url: String
