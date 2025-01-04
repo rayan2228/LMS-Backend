@@ -6,6 +6,7 @@ const lessonSchema = new Schema({
     videoUrl: String,
     resources: [{ type: String }], // Files or links to resources
     module: { type: Schema.Types.ObjectId, ref: 'Module', required: true },
+    preview: { type: Boolean, default: false }
 }, {
     timestamps: true
 });

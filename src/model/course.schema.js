@@ -8,6 +8,11 @@ const courseSchema = new Schema({
         trim: true,
         lowercase: true
     },
+    level: {
+        type: String,
+        enum: ["noob", "pro", "expert"],
+        default: "noob"
+    },
     description: { type: String, required: true },
     instructor: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     category: [{ type: Schema.Types.ObjectId, ref: 'Category', required: true }],

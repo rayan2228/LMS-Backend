@@ -16,7 +16,11 @@ const subcategorySchema = new Schema({
     thumbnail: {
         public_id: String,
         url: String
-    }
+    },
+    category: [{
+        type: Schema.Types.ObjectId,
+        ref: "Category"
+    }]
 }, {
     timestamps: true
 })
