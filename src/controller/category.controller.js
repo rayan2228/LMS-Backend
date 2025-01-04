@@ -1,4 +1,5 @@
 import { Category } from "../model/category.schema.js";
+import { Subcategory } from "../model/subcategory.schema.js";
 import { cloudinaryDelete, cloudinaryUpload } from "../service/cloudinary.js";
 import ApiErrors from "../utils/ApiErrors.js";
 import ApiResponse from "../utils/ApiResponse.js";
@@ -67,17 +68,91 @@ const updateCategory = TryCatch(async (req, res) => {
     return res.status(201).json(new ApiResponse(201, "category created successfully", { categroy: updateedCategory }))
 })
 
+// Get all categories
 const getAllCategories = TryCatch(async (req, res) => {
-    const categories = await Category.find()
-    res.json(new ApiResponse(200, "all category list", { categories }))
-})
-const getCategory = TryCatch(async (req, res) => {
-    const category = await Category.findOne({ name: req.params.categoryName })
-    if (!category) {
-        throw new ApiErrors(404, "no data founded", {})
+    const categories = await Category.find();
+
+    // Check if the list is empty
+    if (!categories || categories.length === 0) {
+        throw new ApiErrors(404, "No categories found", {});
     }
-    res.json(new ApiResponse(200, `${req.params.categoryName} category data`, { category }))
-})
+
+    res.json(new ApiResponse(200, "All category list", { categories }));
+});
+
+// Get a specific category by name
+const getCategory = TryCatch(async (req, res) => {
+    const { categoryName } = req.params;
+
+    // Validate categoryName
+    if (!categoryName || typeof categoryName !== "string") {
+        throw new ApiErrors(400, "Invalid category name", {});
+    }
+
+    const category = await Category.findOne({ name: categoryName });
+
+    if (!category) {
+        throw new ApiErrors(404, `Category "${categoryName}" not found`, {});
+    }
+
+    res.json(new ApiResponse(200, `${categoryName} category data`, { category }));
+});
 
 
-export { createCategory, updateCategory, getAllCategories, getCategory }
+const deleteAllCategories = TryCatch(async (req, res) => {
+    const { categories } = req.body;
+
+    // Check if categories are provided and is a non-empty array
+    if (!Array.isArray(categories) || categories.length === 0) {
+        throw new ApiErrors(404, "No categories selected", {});
+    }
+
+    // Find subcategories associated with the provided categories
+    const subcategories = await Subcategory.find({ category: { $in: categories } });
+
+    if (subcategories.length > 0) {
+        // Update subcategories to remove references to these categories
+        await Subcategory.updateMany(
+            { category: { $in: categories } },
+            { $pull: { category: { $in: categories } } }
+        );
+    }
+
+    // Delete the categories
+    const deleteResult = await Category.deleteMany({ _id: { $in: categories } });
+
+    // Respond with the result
+    res.json(new ApiResponse(200, "All categories are deleted", { deletedCount: deleteResult.deletedCount }));
+});
+
+
+const deleteCategory = TryCatch(async (req, res) => {
+    const { categoryId } = req.params;
+
+    // Validate categoryName
+    if (!categoryId) {
+        throw new ApiErrors(400, "Invalid category id", {});
+    }
+    // Find subcategories associated with the provided categories
+    const subcategories = await Subcategory.find({ category: { $in: categoryId } });
+
+    if (subcategories.length > 0) {
+        // Update subcategories to remove references to these categories
+        await Subcategory.updateMany(
+            { category: { $in: categoryId } },
+            { $pull: { category: { $in: categoryId } } }
+        );
+    }
+    // Attempt to find and delete the category
+    const category = await Category.findByIdAndDelete(categoryId);
+
+    if (!category) {
+        throw new ApiErrors(404, `Category "${categoryId}" not found`, {});
+    }
+
+    res.json(new ApiResponse(200, `Category "${categoryId}" deleted successfully`, {}));
+});
+
+
+
+export { createCategory, updateCategory, getAllCategories, getCategory, deleteAllCategories, deleteCategory }

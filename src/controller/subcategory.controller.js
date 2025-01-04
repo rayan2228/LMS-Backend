@@ -14,7 +14,6 @@ const createSubcategory = TryCatch(async (req, res) => {
             url: cloudinaryResult.optimizeUrl,
         };
     }
-
     if (!name) {
         throw new ApiErrors(400, "subcategory name is required")
     }
@@ -28,6 +27,7 @@ const createSubcategory = TryCatch(async (req, res) => {
     if (!slug) {
         slug = name.replaceAll(" ", "-").toLowerCase()
     }
+    category?.push("677918b65917dd2ce607a32f")
     updates.name = name
     updates.slug = slug
     updates.category = category
