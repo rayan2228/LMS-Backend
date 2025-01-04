@@ -67,7 +67,17 @@ const updateCategory = TryCatch(async (req, res) => {
     return res.status(201).json(new ApiResponse(201, "category created successfully", { categroy: updateedCategory }))
 })
 
+const getAllCategories = TryCatch(async (req, res) => {
+    const categories = await Category.find()
+    res.json(new ApiResponse(200, "all category list", { categories }))
+})
+const getCategory = TryCatch(async (req, res) => {
+    const category = await Category.findOne({ name: req.params.categoryName })
+    if (!category) {
+        throw new ApiErrors(404, "no data founded", {})
+    }
+    res.json(new ApiResponse(200, `${req.params.categoryName} category data`, { category }))
+})
 
 
-
-export { createCategory, updateCategory }
+export { createCategory, updateCategory, getAllCategories, getCategory }
