@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
-import { DBURL } from "../constant.js";
+import Redis from "ioredis"
+import { DBURL, REDISDBURL } from "../constant.js";
 
 const connectDB = async () => {
     try {
@@ -10,4 +11,17 @@ const connectDB = async () => {
     }
 }
 
-export { connectDB }
+
+const connectRadis = async () => {
+    try {
+        const client = new Redis(REDISDBURL);
+        return client
+    } catch (error) {
+        console.log("REDISDB", error);
+    }
+
+}
+
+const redis = connectRadis()
+
+export { connectDB, redis }
