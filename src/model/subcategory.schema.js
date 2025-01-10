@@ -25,4 +25,13 @@ const subcategorySchema = new Schema({
     timestamps: true
 })
 
+
+subcategorySchema.pre("save", async(function (next) {
+    if (this.$isNew) {
+        this.category.push("677918b65917dd2ce607a32f")
+        next()
+    }
+    next()
+}))
+
 export const Subcategory = mongoose.models.Subcategory || mongoose.model("Subcategory", subcategorySchema)

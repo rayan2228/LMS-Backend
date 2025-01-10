@@ -1,4 +1,5 @@
 import { Category } from "../model/category.schema.js";
+import { Course } from "../model/course.schema.js";
 import { Subcategory } from "../model/subcategory.schema.js";
 import { cloudinaryDelete, cloudinaryUpload } from "../service/cloudinary.js";
 import ApiErrors from "../utils/ApiErrors.js";
@@ -46,7 +47,6 @@ const updateCategory = TryCatch(async (req, res) => {
             await cloudinaryDelete(category.thumbnail.public_id);
         }
         const cloudinaryResult = await cloudinaryUpload(thumbnail.path, category.name, "category");
-        console.log("asas");
         updates.thumbnail = {
             public_id: cloudinaryResult.uploadResult.public_id,
             url: cloudinaryResult.optimizeUrl,
@@ -64,8 +64,8 @@ const updateCategory = TryCatch(async (req, res) => {
     }
     updates.name = name
     updates.slug = slug
-    const updateedCategory = await Category.findOneAndUpdate({ name: category.name }, { $set: updates }, { new: true })
-    return res.status(201).json(new ApiResponse(201, "category created successfully", { categroy: updateedCategory }))
+    const updatedCategory = await Category.findOneAndUpdate({ name: category.name }, { $set: updates }, { new: true })
+    return res.status(201).json(new ApiResponse(201, "category updated successfully", { categroy: updatedCategory }))
 })
 
 // Get all categories
@@ -116,13 +116,17 @@ const deleteAllCategories = TryCatch(async (req, res) => {
             { category: { $in: categories } },
             { $pull: { category: { $in: categories } } }
         );
+        await Course.updateMany(
+            { category: { $in: categories } },
+            { $pull: { category: { $in: categories } } }
+        );
     }
 
     // Delete the categories
     const deleteResult = await Category.deleteMany({ _id: { $in: categories } });
 
     // Respond with the result
-    res.json(new ApiResponse(200, "All categories are deleted", { deletedCount: deleteResult.deletedCount }));
+    res.json(new ApiResponse(200, "selected categories are deleted", { deletedCount: deleteResult.deletedCount }));
 });
 
 
@@ -142,15 +146,19 @@ const deleteCategory = TryCatch(async (req, res) => {
             { category: { $in: categoryId } },
             { $pull: { category: { $in: categoryId } } }
         );
+        await Course.updateMany(
+            { subcategory: { $in: categoryId } },
+            { $pull: { category: { $in: categoryId } } }
+        );
     }
     // Attempt to find and delete the category
     const category = await Category.findByIdAndDelete(categoryId);
 
     if (!category) {
-        throw new ApiErrors(404, `Category "${categoryId}" not found`, {});
+        throw new ApiErrors(404, `Category  not found`, {});
     }
 
-    res.json(new ApiResponse(200, `Category "${categoryId}" deleted successfully`, {}));
+    res.json(new ApiResponse(200, `Category deleted successfully`, {}));
 });
 
 
