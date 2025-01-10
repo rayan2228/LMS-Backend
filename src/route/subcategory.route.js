@@ -7,7 +7,7 @@ import { createSubcategory, deleteAllSubcategories, deleteSubcategory, getAllSub
 const router = express.Router()
 
 router.route("/subcategories").get(getAllSubcategories).post(auth, admin, upload.single("thumbnail"), createSubcategory).delete(auth, admin, deleteAllSubcategories)
-router.route("/categories/:categoryName").get(getSubcategory).put(auth, admin, upload.single("thumbnail"), updatesubcategory)
-router.route("/categories/:categoryId").delete(auth, admin, deleteSubcategory)
+router.route("/subcategories/:subcategoryName").get(getSubcategory).put(auth, admin, upload.single("thumbnail"), updatesubcategory)
+router.route("/subcategories/:subcategoryId").delete(auth, admin, deleteSubcategory)
 
 export default router

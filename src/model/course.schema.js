@@ -32,4 +32,13 @@ const courseSchema = new Schema({
     timestamps: true
 });
 
+
+courseSchema.pre("save", async function (next) {
+    if (this.$isNew) {
+        this.category.push("677918b65917dd2ce607a32f")
+        this.subcategory.push("677918b65917dd2ce607a32f")
+        next()
+    }
+    next()
+})
 export const Course = mongoose.models.Course || mongoose.model("Course", courseSchema)
