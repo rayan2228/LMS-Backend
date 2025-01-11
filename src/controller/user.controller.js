@@ -81,7 +81,7 @@ const login = TryCatch(async (req, res) => {
         httpOnly: true,
         sameSite: "Strict",
     };
-    
+
     await redis.set(responseUser.username, JSON.stringify(responseUser))
     res.cookie("accessToken", accessToken, options)
         .cookie("refreshToken", refreshToken, options)
@@ -98,12 +98,12 @@ const updateProfile = TryCatch(async (req, res) => {
             url: cloudinaryResult.optimizeUrl,
         };
     }
-    if (req.body.displayname) updates.displayname = req.body.displayname;
-    if (req.body.bio) updates.bio = req.body.bio;
-
+    if (req.body.displayname) updates.displayname = req.body.displayname.trim();
+    if (req.body.bio) updates.bio = req.body.bio.trim();
     if (Object.keys(updates).length === 0) throw new ApiErrors(400, "No updates provided");
 
     const user = await User.findByIdAndUpdate(req.user._id, { $set: updates }, { new: true });
+    await redis.set(req.user.username, JSON.stringify(user))
     return res.json(new ApiResponse(200, "Profile updated", { user }));
 });
 
@@ -130,7 +130,6 @@ const changePassword = TryCatch(async (req, res) => {
 
     user.password = newPassword;
     await user.save();
-
     return res.json(new ApiResponse(200, "Password updated successfully"));
 });
 

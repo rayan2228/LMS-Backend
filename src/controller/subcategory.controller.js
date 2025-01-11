@@ -1,3 +1,4 @@
+import { redis } from "../db/index.js";
 import { Course } from "../model/course.schema.js";
 import { Subcategory } from "../model/subcategory.schema.js";
 import { cloudinaryDelete, cloudinaryUpload } from "../service/cloudinary.js";
@@ -34,6 +35,7 @@ const createSubcategory = TryCatch(async (req, res) => {
     updates.slug = slug
     updates.category = category
     const subcategory = await Subcategory.create(updates)
+    await redis.del("subcategories")
     return res.status(201).json(new ApiResponse(201, "subcategory created successfully", { subcategory }))
 })
 
@@ -69,17 +71,26 @@ const updatesubcategory = TryCatch(async (req, res) => {
     updates.name = name
     updates.slug = slug
     const updatedSubcategory = await Subcategory.findOneAndUpdate({ name: subcategory.name }, { $set: updates }, { new: true })
+    await redis.del("subcategories")
     return res.status(201).json(new ApiResponse(201, "subcategory updated successfully", { subcategory: updatedSubcategory }))
 })
 
 // Get all categories
 const getAllSubcategories = TryCatch(async (req, res) => {
-    const subcategories = await Subcategory.find().populate("category");
+    let subcategories = null
+    const rsubcategories = await redis.get("subcategories")
+
+    if (rsubcategories) {
+        subcategories = JSON.parse(rsubcategories)
+    } else {
+        subcategories = await Subcategory.find().populate("category");;
+        if (!subcategories || subcategories.length === 0) {
+            throw new ApiErrors(404, "No subcategories found", {});
+        }
+        redis.set("subcategories", JSON.stringify(subcategories))
+    }
 
     // Check if the list is empty
-    if (!subcategories || subcategories.length === 0) {
-        throw new ApiErrors(404, "No subcategories found", {});
-    }
 
     res.json(new ApiResponse(200, "All subcategory list", { subcategories }));
 });
@@ -124,7 +135,7 @@ const deleteAllSubcategories = TryCatch(async (req, res) => {
 
     // Delete the categories
     const deleteResult = await Subcategory.deleteMany({ _id: { $in: subcategories } });
-
+    await redis.del("subcategories")
     // Respond with the result
     res.json(new ApiResponse(200, "selected subcategories are deleted", { deletedCount: deleteResult.deletedCount }));
 });
@@ -153,7 +164,7 @@ const deleteSubcategory = TryCatch(async (req, res) => {
     if (!subcategory) {
         throw new ApiErrors(404, `subcategory not found`, {});
     }
-
+    await redis.del("subcategories")
     res.json(new ApiResponse(200, `subcategory deleted successfully`, {}));
 });
 

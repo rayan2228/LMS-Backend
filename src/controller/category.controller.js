@@ -1,3 +1,4 @@
+import { redis } from "../db/index.js";
 import { Category } from "../model/category.schema.js";
 import { Course } from "../model/course.schema.js";
 import { Subcategory } from "../model/subcategory.schema.js";
@@ -30,6 +31,7 @@ const createCategory = TryCatch(async (req, res) => {
     updates.name = name
     updates.slug = slug
     const category = await Category.create(updates)
+    await redis.del("categories")
     return res.status(201).json(new ApiResponse(201, "category created successfully", { category }))
 })
 
@@ -65,17 +67,26 @@ const updateCategory = TryCatch(async (req, res) => {
     updates.name = name
     updates.slug = slug
     const updatedCategory = await Category.findOneAndUpdate({ name: category.name }, { $set: updates }, { new: true })
+    await redis.del("categories")
     return res.status(201).json(new ApiResponse(201, "category updated successfully", { categroy: updatedCategory }))
 })
 
 // Get all categories
 const getAllCategories = TryCatch(async (req, res) => {
-    const categories = await Category.find();
+    let categories = null
+    const rcategories = await redis.get("categories")
 
-    // Check if the list is empty
-    if (!categories || categories.length === 0) {
-        throw new ApiErrors(404, "No categories found", {});
+    if (rcategories) {
+        categories = JSON.parse(rcategories)
+    } else {
+        categories = await Category.find().lean();
+        // Check if the list is empty
+        if (!categories || categories.length === 0) {
+            throw new ApiErrors(404, "No categories found", {});
+        }
+        redis.set("categories", JSON.stringify(categories))
     }
+
 
     res.json(new ApiResponse(200, "All category list", { categories }));
 });
@@ -124,7 +135,7 @@ const deleteAllCategories = TryCatch(async (req, res) => {
 
     // Delete the categories
     const deleteResult = await Category.deleteMany({ _id: { $in: categories } });
-
+    await redis.del("categories")
     // Respond with the result
     res.json(new ApiResponse(200, "selected categories are deleted", { deletedCount: deleteResult.deletedCount }));
 });
@@ -157,7 +168,7 @@ const deleteCategory = TryCatch(async (req, res) => {
     if (!category) {
         throw new ApiErrors(404, `Category  not found`, {});
     }
-
+    await redis.del("categories")
     res.json(new ApiResponse(200, `Category deleted successfully`, {}));
 });
 
