@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
-import { User } from "../model/user.schema.js";
 import ApiErrors from "./ApiErrors.js";
+import { redis } from "../db/index.js";
 
 const verifyToken = async (token, signature, type = "access") => {
     if (!token) {
@@ -13,8 +13,9 @@ const verifyToken = async (token, signature, type = "access") => {
     } catch (err) {
         throw new ApiErrors(401, `Invalid ${type} token`);
     }
-
-    const user = await User.findById(decodedToken._id);
+    const ruser = await redis.get(decodedToken.username) 
+    
+    const user = JSON.parse(ruser)
     if (!user) {
         throw new ApiErrors(401, "User not found");
     }

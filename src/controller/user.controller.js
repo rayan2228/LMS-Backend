@@ -9,6 +9,7 @@ import { TryCatch } from "../utils/TryCatch.js";
 import ApiResponse from "../utils/ApiResponse.js";
 import { extractToken, verifyToken } from "../utils/tokenChecker.js";
 import { cloudinaryUpload } from "../service/cloudinary.js";
+import { redis } from "../db/index.js";
 
 const generateTokens = async (_id) => {
     const user = await User.findById(_id);
@@ -80,7 +81,8 @@ const login = TryCatch(async (req, res) => {
         httpOnly: true,
         sameSite: "Strict",
     };
-
+    
+    await redis.set(responseUser.username, JSON.stringify(responseUser))
     res.cookie("accessToken", accessToken, options)
         .cookie("refreshToken", refreshToken, options)
         .json(new ApiResponse(200, "Login successful", { user: responseUser, accessToken, refreshToken }));
@@ -107,6 +109,7 @@ const updateProfile = TryCatch(async (req, res) => {
 
 const logout = TryCatch(async (req, res) => {
     await User.findByIdAndUpdate(req.user._id, { refreshToken: null });
+    await redis.del(req.user.username)
     res.clearCookie("accessToken").clearCookie("refreshToken");
     return res.json(new ApiResponse(200, "Logout successful"));
 });

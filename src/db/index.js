@@ -15,6 +15,7 @@ const connectDB = async () => {
 const connectRadis = async () => {
     try {
         const client = new Redis(REDISDBURL);
+        console.log("redis connected");
         return client
     } catch (error) {
         console.log("REDISDB", error);
@@ -22,6 +23,6 @@ const connectRadis = async () => {
 
 }
 
-const redis = connectRadis()
+const redis = await connectRadis()
 
 export { connectDB, redis }
