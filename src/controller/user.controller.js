@@ -51,6 +51,31 @@ const createUser = TryCatch(async (req, res) => {
 
     return res.status(201).json(new ApiResponse(201, "User created successfully", { user }));
 });
+const createRoleUser = TryCatch(async (req, res) => {
+    const { displayname, username, email, password, role } = req.body;
+    validateFields([displayname, username, email, password]);
+
+    const isEmailFound = await User.findOne({ email });
+    if (isEmailFound) return res.status(400).json({ message: "Email already in use" });
+
+    const isUsernameFound = await User.findOne({ username });
+    if (isUsernameFound) throw new ApiErrors(400, "Username already in use");
+
+    if (!validatePassword(password)) {
+        throw new ApiErrors(
+            400,
+            "Password must contain at least one letter, one number, one special character, and be at least 8 characters long"
+        );
+    }
+
+    const createdUser = await User.create({ displayname, username, email, password });
+    const user = await User.findById(createdUser._id).select("-password");
+
+    const token = user.verificationToken();
+    sendMail(user.email, "Verification Mail", "", verificationMail(user.displayname, token));
+
+    return res.status(201).json(new ApiResponse(201, "User created successfully", { user }));
+});
 
 const emailVerification = TryCatch(async (req, res) => {
     const { token } = req.params;

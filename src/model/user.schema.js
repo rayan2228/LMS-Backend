@@ -3,6 +3,7 @@ import { validateEmail } from "../helper/index.js";
 import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
 import { ACCESSSTOKEN_EXPRIE, ACCESSSTOKEN_SIGNATURE, REFRESHTOKEN_EXPRIE, REFRESHTOKEN_SIGNATURE, VERIFICATION_SIGNATURE } from "../constant.js";
+import { type } from "os";
 const userSchema = new Schema({
     displayname: {
         type: String,
@@ -36,16 +37,34 @@ const userSchema = new Schema({
         public_id: String,
         url: String
     },
-    role: {
+    role: [{
         type: String,
-        enum: ["student", "teacher", "admin"],
+        enum: ["student", "instructor", "admin", "editor"],
         default: "student"
+    }],
+    courses: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Course"
+        }
+    ],
+    isActive: {
+        type: Boolean,
+        default: true
     },
     bio: String,
     emailVerified: Date,
     passwordReset: String,
-    refreshToken: String
+    refreshToken: String,
+
 }, { timestamps: true })
+
+userSchema.pre("save", async function (next) {
+    if (this.role === "instructor") {
+        this.isActive = false
+    }
+    next()
+})
 
 userSchema.pre("save", async function (next) {
     if (!this.isModified("password")) return next()
