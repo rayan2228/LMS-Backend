@@ -93,7 +93,7 @@ const login = TryCatch(async (req, res) => {
     const { email, password } = req.body;
     validateFields([email, password]);
 
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email }).populate("role");
     if (!user || !(await user.matchPassword(password))) {
         throw new ApiErrors(400, "Invalid credentials");
     }
@@ -127,7 +127,7 @@ const updateProfile = TryCatch(async (req, res) => {
     if (req.body.bio) updates.bio = req.body.bio.trim();
     if (Object.keys(updates).length === 0) throw new ApiErrors(400, "No updates provided");
 
-    const user = await User.findByIdAndUpdate(req.user._id, { $set: updates }, { new: true });
+    const user = await User.findByIdAndUpdate(req.user._id, { $set: updates }, { new: true }).populate("role");
     await redis.set(req.user.username, JSON.stringify(user))
     return res.json(new ApiResponse(200, "Profile updated", { user }));
 });
