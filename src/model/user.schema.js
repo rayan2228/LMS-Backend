@@ -37,11 +37,7 @@ const userSchema = new Schema({
         public_id: String,
         url: String
     },
-    role: [{
-        type: String,
-        enum: ["student", "instructor", "admin", "editor"],
-        default: "student"
-    }],
+    role: { type: Schema.Types.ObjectId, ref: 'Role', required: true },
     courses: [
         {
             type: mongoose.Schema.Types.ObjectId,
