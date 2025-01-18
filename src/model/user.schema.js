@@ -3,7 +3,6 @@ import { validateEmail } from "../helper/index.js";
 import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
 import { ACCESSSTOKEN_EXPRIE, ACCESSSTOKEN_SIGNATURE, REFRESHTOKEN_EXPRIE, REFRESHTOKEN_SIGNATURE, VERIFICATION_SIGNATURE } from "../constant.js";
-import { type } from "os";
 const userSchema = new Schema({
     displayname: {
         type: String,
@@ -37,7 +36,7 @@ const userSchema = new Schema({
         public_id: String,
         url: String
     },
-    role: { type: Schema.Types.ObjectId, ref: 'Role', required: true },
+    role: [{ type: Schema.Types.ObjectId, ref: 'Role' }],
     courses: [
         {
             type: mongoose.Schema.Types.ObjectId,

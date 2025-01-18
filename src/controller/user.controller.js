@@ -51,6 +51,7 @@ const createUser = TryCatch(async (req, res) => {
 
     return res.status(201).json(new ApiResponse(201, "User created successfully", { user }));
 });
+
 const createRoleUser = TryCatch(async (req, res) => {
     const { displayname, username, email, password, role } = req.body;
     validateFields([displayname, username, email, password]);
@@ -93,7 +94,7 @@ const login = TryCatch(async (req, res) => {
     const { email, password } = req.body;
     validateFields([email, password]);
 
-    const user = await User.findOne({ email }).populate("role");
+    const user = await User.findOne({ email });
     if (!user || !(await user.matchPassword(password))) {
         throw new ApiErrors(400, "Invalid credentials");
     }

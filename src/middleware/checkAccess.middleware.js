@@ -1,6 +1,6 @@
 import { TryCatch } from "../utils/TryCatch";
 
-function checkAccess(requiredRoles = [], requiredPermissions = []) {
+export function checkAccess(requiredRoles = [], requiredPermissions = []) {
     return TryCatch(async (req, res, next) => {
         const user = req.user
 

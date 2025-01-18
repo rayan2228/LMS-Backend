@@ -1,11 +1,11 @@
 import express from "express";
-
 import { upload } from "../middleware/multer.middleware.js";
 import { auth } from "../middleware/auth.middleware.js";
-import { createCourse } from "../controller/course.controller.js";
+import { createPermission, getPermissions } from "../middleware/permission.controller.js";
+
 const router = express.Router()
 
-router.route("/courses").post(auth, upload.single("thumbnail"), createCourse)
+router.route("/permissions").get(auth, getPermissions).post(auth, createPermission)
 
 
 export default router
