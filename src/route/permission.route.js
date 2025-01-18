@@ -1,7 +1,6 @@
 import express from "express";
-import { upload } from "../middleware/multer.middleware.js";
 import { auth } from "../middleware/auth.middleware.js";
-import { createPermission, getPermissions } from "../middleware/permission.controller.js";
+import { createPermission, getPermissions } from "../controller/permission.controller.js";
 
 const router = express.Router()
 

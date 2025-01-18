@@ -16,10 +16,12 @@ import courseRoute from "./route/course.route.js";
 import categoryRoute from "./route/category.route.js";
 import subcategoryRoute from "./route/subcategory.route.js";
 import permissionRoute from "./route/permission.route.js";
+import roleRoute from "./route/role.route.js";
 app.use("/api/v1", userRoute);
 app.use("/api/v1", courseRoute);
 app.use("/api/v1", categoryRoute);
 app.use("/api/v1", subcategoryRoute);
+app.use("/api/v1", roleRoute);
 if (process.env.NODE_ENV === "development") {
     app.use("/api/v1", permissionRoute);
 }
