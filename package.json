@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "node --watch index.js",
     "start": "nodemon index.js",
-    "seedAdmin": "node ./src/seeders/admincreate.seeder.js"
+    "seed": "node ./src/seeders/index.seeder.js"
   },
   "keywords": [],
   "author": "",

@@ -1,4 +1,4 @@
-
+import mongoose from "mongoose";
 import { connectDB } from "../db/index.js";
 import { seedAdmin } from "./admincreate.seeder.js";
 import { seedPermissions } from "./permissionSeeder.js";
@@ -12,8 +12,11 @@ const seed = async () => {
                 }
             }
         }
+        mongoose.disconnect().then(() => console.log("DB Disconnected"));
+        process.exit(1);
     } catch (error) {
         console.error("Error seeding:", error);
+        process.exit(1);
     }
 }
 

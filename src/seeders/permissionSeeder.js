@@ -1,5 +1,7 @@
+import { ADMIN_EMAIL } from "../constant.js";
 import { Permission } from "../model/permission.schema.js";
 import { Role } from "../model/role.schema.js";
+import { User } from "../model/user.schema.js";
 
 // Define permissions
 const permissions = [
@@ -59,6 +61,7 @@ export const seedPermissions = async () => {
         // Remove existing permissions and roles
         await Permission.deleteMany({});
         await Role.deleteMany({});
+        await User.findOneAndDelete({ email: ADMIN_EMAIL });
         // Insert permissions
         await Permission.insertMany(permissions);
         console.log('Permissions inserted.');
