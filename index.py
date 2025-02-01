@@ -1,1 +1,4 @@
 print('Nice')
+print('Nice')
+
+
