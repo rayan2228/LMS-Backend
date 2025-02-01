@@ -21,3 +21,5 @@ const createCoupon = TryCatch(async (req, res) => {
     })
     return res.status(201).json(new ApiResponse(201, "coupon code created successfully", coupon))
 });
+
+export {createCoupon}
