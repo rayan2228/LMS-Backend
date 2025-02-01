@@ -4,7 +4,7 @@ const couponSchema = new Schema({
     code: { type: String, unique: true, required: true },
     description: String,
     discountType: { type: String, enum: ["percentage", "fixed"], required: true },
-    discountValue: { type: Number, required: true },
+    discountValue: { type: Number },
     minimum_order_value: Number, // Optional minimum cart value to apply the coupon
     maximum_discount: Number, // Optional cap for percentage discounts
     appliesTo: {
@@ -25,7 +25,7 @@ const couponSchema = new Schema({
             used_at: { type: Date, default: Date.now() }
         }
     ],
-    auto_apply: Boolean,
+    auto_apply: { type: Boolean, default: false },
     startDate: { type: Date },
     expiryDate: { type: Date },
     isActive: { type: Boolean, default: true },
