@@ -4,7 +4,7 @@ import { createPermission, getPermissions } from "../controller/permission.contr
 
 const router = express.Router()
 
-router.route("/permissions").get(auth, getPermissions).post(auth, createPermission)
+router.route("/permissions").get(getPermissions).post(createPermission)
 
 
 export default router

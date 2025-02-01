@@ -10,6 +10,8 @@ import ApiResponse from "../utils/ApiResponse.js";
 import { extractToken, verifyToken } from "../utils/tokenChecker.js";
 import { cloudinaryUpload } from "../service/cloudinary.js";
 import { redis } from "../db/index.js";
+import { userInfo } from "../template/mail/userInfo.js";
+
 
 const generateTokens = async (_id) => {
     const user = await User.findById(_id);
@@ -55,6 +57,9 @@ const createUser = TryCatch(async (req, res) => {
 const createRoleUser = TryCatch(async (req, res) => {
     const { displayname, username, email, password, role } = req.body;
     validateFields([displayname, username, email, password]);
+    if (role.length === 0) {
+        throw new ApiErrors(400, "Role is required");
+    }
 
     const isEmailFound = await User.findOne({ email });
     if (isEmailFound) return res.status(400).json({ message: "Email already in use" });
@@ -69,11 +74,10 @@ const createRoleUser = TryCatch(async (req, res) => {
         );
     }
 
-    const createdUser = await User.create({ displayname, username, email, password });
+    const createdUser = await User.create({ displayname, username, email, password, role });
     const user = await User.findById(createdUser._id).select("-password");
 
-    const token = user.verificationToken();
-    sendMail(user.email, "Verification Mail", "", verificationMail(user.displayname, token));
+    sendMail(user.email, "user account info", "", userInfo(displayname, password));
 
     return res.status(201).json(new ApiResponse(201, "User created successfully", { user }));
 });
@@ -87,14 +91,17 @@ const emailVerification = TryCatch(async (req, res) => {
     if (!user) throw new ApiErrors(400, "Invalid token");
 
     await User.findByIdAndUpdate(decoded._id, { emailVerified: Date.now() }, { new: true });
-    return res.status(200).send("Email verified successfully");
+    return res.status(200).json(new ApiResponse(200, "Email verified successfully"));
 });
 
 const login = TryCatch(async (req, res) => {
     const { email, password } = req.body;
     validateFields([email, password]);
 
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email }).populate({
+        path: "role",
+        populate: { path: "permissions", select: "name _id" }
+    });
     if (!user || !(await user.matchPassword(password))) {
         throw new ApiErrors(400, "Invalid credentials");
     }
@@ -171,4 +178,4 @@ const refreshAccessToken = TryCatch(async (req, res) => {
     res.cookie("accessToken", accessToken, options).json(new ApiResponse(200, "Access token refreshed", { accessToken }));
 });
 
-export { createUser, emailVerification, login, updateProfile, logout, changePassword, refreshAccessToken };
+export { createUser, emailVerification, login, updateProfile, logout, changePassword, refreshAccessToken, createRoleUser };

@@ -118,7 +118,5 @@ dist
 .pnp.*
 
 # End of https://mrkandreev.name/snippets/gitignore-generator/#Node
-course chema.wmv
-
-.mp4
-category create.wmv
+*.mp4
+*.wmv

@@ -1,7 +1,7 @@
-import { model, models, Schema } from "mongoose";
+import mongoose, { model , Schema } from "mongoose";
 
 const lessonSchema = new Schema({
-    title: { type: String, required: true },
+    title: { type: String, required: [true, "lesson is required"] },
     content: { type: String },
     videoUrl: String,
     resources: [{ type: String }], // Files or links to resources
@@ -10,4 +10,4 @@ const lessonSchema = new Schema({
 }, {
     timestamps: true
 });
-export const Lesson = models.Module || model("Lesson", lessonSchema)
+export const Lesson = mongoose.models.Module || model("Lesson", lessonSchema)

@@ -1,4 +1,4 @@
-import { model, models, Schema } from "mongoose";
+import mongoose, { model, Schema } from "mongoose";
 
 const topicSchema = new Schema({
     name: {
@@ -11,4 +11,4 @@ const topicSchema = new Schema({
     timestamps: true
 })
 
-export const Topic = models.Topic || model("Topic", topicSchema) 
+export const Topic = mongoose.models.Topic || model("Topic", topicSchema) 

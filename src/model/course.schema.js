@@ -6,7 +6,8 @@ const courseSchema = new Schema({
         type: String,
         unique: true,
         trim: true,
-        lowercase: true
+        lowercase: true,
+        required: true
     },
     level: {
         type: String,
@@ -18,13 +19,12 @@ const courseSchema = new Schema({
     category: [{ type: Schema.Types.ObjectId, ref: 'Category', required: true }],
     subcategory: [{ type: Schema.Types.ObjectId, ref: 'Subcategory', required: true }],
     price: { type: Number, default: 0, required: true },
-    discountType: { type: String, enum: ["percentage", "fixed"] },
-    discountValue: { type: Number },
+    discountType: { type: String, enum: ["percentage", "fixed"] , default: "fixed" },
+    discountValue: { type: Number, default: 0 },
     thumbnail: {
         public_id: String,
         url: String
     },
-    modules: [{ type: Schema.Types.ObjectId, ref: 'Module' }],
     topics: [{ type: Schema.Types.ObjectId, ref: 'Topic', required: true, max: 5 }]
 }, {
     timestamps: true

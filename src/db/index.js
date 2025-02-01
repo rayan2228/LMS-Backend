@@ -4,7 +4,10 @@ import { DBURL, REDISDBURL } from "../constant.js";
 
 const connectDB = async () => {
     try {
-        await mongoose.connect(DBURL)
+        await mongoose.connect(DBURL, {
+            serverSelectionTimeoutMS: 30000, // Increase timeout to 30 seconds
+            socketTimeoutMS: 45000, // Increase socket timeout
+        })
         console.log("DB Coonected");
     } catch (error) {
         console.log("DB", error);
