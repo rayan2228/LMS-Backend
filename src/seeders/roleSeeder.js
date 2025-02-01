@@ -7,15 +7,6 @@ export const seedRoles = async () => {
 
         // Fetch all permissions
         const permissions = await Permission.find();
-        if (permissions.length === 0) {
-            console.error("No permissions found. Please seed permissions first.");
-            return false;
-        }
-        const rolesExite = await Role.find();
-        if (rolesExite.length > 0) {
-            console.log("Roles already exist.");
-            return false;
-        }
         // Create roles with permissions
         const roles = [
             {
@@ -93,10 +84,11 @@ export const seedRoles = async () => {
         ];
 
         await Role.insertMany(roles);
-
         console.log("Roles seeded successfully!");
+        return true;
     } catch (error) {
         console.error("Error seeding roles:", error);
+        return false
     }
 };
 

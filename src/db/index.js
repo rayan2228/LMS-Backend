@@ -9,8 +9,10 @@ const connectDB = async () => {
             socketTimeoutMS: 45000, // Increase socket timeout
         })
         console.log("DB Coonected");
+        return true
     } catch (error) {
         console.log("DB", error);
+        return false
     }
 }
 

@@ -1,4 +1,5 @@
 import { Permission } from "../model/permission.schema.js";
+import { Role } from "../model/role.schema.js";
 
 // Define permissions
 const permissions = [
@@ -55,17 +56,16 @@ const permissions = [
 
 export const seedPermissions = async () => {
     try {
-        const existingPermissions = await Permission.find();
-        if (existingPermissions.length > 0) {
-            console.log('Permissions already exist.');
-            return true;
-        }
+        // Remove existing permissions and roles
+        await Permission.deleteMany({});
+        await Role.deleteMany({});
         // Insert permissions
         await Permission.insertMany(permissions);
         console.log('Permissions inserted.');
         return true
     } catch (error) {
         console.error('Error during seeding:', error);
+        return false;
     }
 };
 
