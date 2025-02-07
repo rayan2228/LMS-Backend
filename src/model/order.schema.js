@@ -10,7 +10,7 @@ const orderSchema = new Schema(
             default: "pending",
         },
         paymentMethod: { type: String, enum: ["stripe", "paypal", "sslCommerz"], required: true },
-        paymentStatus: { type: String, enum: ["pending", "paid", "failed"], default: "pending" },
+        paymentStatus: { type: String, enum: ["paid", "failed"], default: "paid" },
     },
     { timestamps: true }
 );
